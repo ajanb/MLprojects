@@ -23,10 +23,10 @@ data.info()
 num_records = len(data)
 
 #Number of records with an income >= $50k
-num_plus50k = len(data[data['income']=='>50K'])
+num_plus50k = len(data[data['income'] == '>50K'])
 
 #Number of records with an income < $50k 
-num_minus50k = len(data[data['income']=='<=50K'])
+num_minus50k = len(data[data['income'] == '<=50K'])
 
 #Percentage of >$50k income 
 plus_percent = 100 * num_plus50k / num_records 
@@ -66,7 +66,7 @@ skewed = [
 raw_feature[skewed] = data[skewed].apply(lambda x: np.log(x+1))
 
 #Show log distributions
-vs.distribution('DistributionLog', raw_feature, transformed=True)
+vs.distribution('DistributionLog', raw_feature, transformed = True)
 
 
 #Normalize numerical features
@@ -91,12 +91,21 @@ features=pd.get_dummies(raw_feature)
 income = raw_income.apply(lambda x: 1 if x == '>50K' else 0) 
 
 encoded = list(features.columns)
-print('{} total features after one-hot encoding'.format(len(encoded)))
+
+print(
+    '{} total features after one-hot encoding'\
+    .format(len(encoded))
+    )
 
 
 # Shuffle and split data 
 
-X_train, X_test, y_train, y_test = train_test_split(features, income, test_size=0.2, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(
+                                    features, 
+                                    income, 
+                                    test_size=0.2, 
+                                    random_state=0,
+                                    )
 
 print('Training set shape: {}'.format(X_train.shape))
 print('Test set shape: {}'.format(X_test.shape))
