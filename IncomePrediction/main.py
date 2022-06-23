@@ -1,4 +1,5 @@
 import os
+os.chdir("/Users/bekzatajan/Projects/MLprojects/IncomePrediction")
 
 import plotter as vs 
 
@@ -11,13 +12,15 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import fbeta_score, accuracy_score
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import make_scorer
+from sklearn.model_selection import GridSearchCV 
+from sklearn.preprocessing import MinMaxScaler 
 
 from time import time 
 import matplotlib.pyplot as plt 
 import seaborn as sns 
 
 
-os.chdir("/Users/bekzatajan/Projects/MLprojects/IncomePrediction")
 
 #The last column "income" will be our target label in order to find if the person makes more than $50,000 annually
 data = pd.read_csv("../data/census.csv")
@@ -77,7 +80,6 @@ vs.distribution('DistributionLog', raw_feature, transformed = True)
 
 #Normalize numerical features
 
-from sklearn.preprocessing import MinMaxScaler 
 
 scaler = MinMaxScaler() 
 numerical = [
@@ -126,7 +128,7 @@ fscore = (1 + (0.5 * 0.5)) * (precision * recall / (0.5 * 0.5 * precision +recal
 
 print(
     'Naive predictor:\n\tAccuracy score: {:.4f}\n\tF1-score: {:.4f}'\
-    .format(accuracy, f1score)
+    .format(accuracy, fscore)
     )
 
 # Decision Trees 
@@ -240,6 +242,48 @@ for i, model in enumerate([clf_A, clf_B, clf_C]):
     plt.xlabel('Predicted label')
     plt.title('Confusion matrix for: \n{}'.format(model.__class__.__name__))
     plt.savefig('Plots/ConfusionMatrixFor_'+model.__class__.__name__+'.png')
+
+
+
+# Hyperparameter tuning 
+
+clf = AdaBoostClassifier(base_estimator=DecisionTreeClassifier())
+
+# Create the parameters list you wish to tune
+parameters = {
+    'n_estimators':[50, 120],
+    'learning_rate':[0.1, 0.5, 1.],
+    'base_estimator__min_samples_split' : np.arange(2, 8, 2),
+    'base_estimator__max_depth' : np.arange(1, 4, 1)
+}
+
+# Make an fbeta_score scoring object
+scorer = make_scorer(fbeta_score,beta=0.5)
+
+# Perform grid search on the classifier using 'scorer' as the scoring method
+grid_obj = GridSearchCV(estimator=clf, param_grid=parameters,scoring=scorer)
+
+# Fit the grid search object to the training data and find the optimal parameters
+grid_fit = grid_obj.fit(X_train,y_train)
+
+
+
+best_clf = grid_fit.best_estimator_
+
+predictions = (clf.fit(X_train, y_train)).predict(X_test)
+bets_predictions = best_clf.predict(X_test)
+
+print("Unoptimized model\n------")
+print("Accuracy score on testing data: {:.4f}".format(accuracy_score(y_test, predictions)))
+print("F-score on testing data: {:.4f}".format(fbeta_score(y_test, predictions, beta = 0.5)))
+print("\nOptimized Model\n------")
+print("Final accuracy score on the testing data: {:.4f}".format(accuracy_score(y_test, best_predictions)))
+print("Final F-score on the testing data: {:.4f}".format(fbeta_score(y_test, best_predictions, beta = 0.5)))
+print(best_clf)
+
+
+
+
 
 
 
