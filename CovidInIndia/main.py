@@ -86,7 +86,7 @@ p = (
     + scale_color_manual(palette)
     + facet_wrap(facets="City", ncol=1)
 )
-p.save(filename="plots/forecast_m5_state_ts_tail.jpg", width=14, height=10)
+p.save(filename="plots/ConfirmedCases.jpg", width=14, height=10)
 
 
 df_prep_boost = df_roll.dropna()
