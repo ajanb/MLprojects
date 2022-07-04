@@ -1,5 +1,9 @@
 Data: Hourly averaged data of responses from 5 metal oxides chemical sensors of Air Quality Chemical Multisensor Device. The device was placed in a significantly polluted area of Italy.
 
+Target variables:
+- Carbon monoxide 
+- Benzene 
+- Nitrogen oxides 
 
 Sensors:
 - S1 tin oxide (nominally CO targeted)
@@ -9,31 +13,22 @@ Sensors:
 - S5 indium oxide (nominally O3 targeted)
 
 
-Predict the target values using the following parameters:
+Predict the target values using the following features:
 - 5 sensors collecting chemicals data in the air
 - Weather condition at the time of collecting the data (humidity, temperature)
 
   Extracted the following features from date and time column:
-  - Time of day 
-  - Weekday
-  - Season
+  - Time of day (morning, day, night)
+  - Weekend or not
+  - Season (Fall, Winter, Spring, Summer)
   - Month
-
-
-Target values:
-- Carbon monoxide 
-- Benzene 
-- Nitrogen oxides 
 
 
 Auto-correlation
 - Before applying machine learning models to time series data, you have to transform it to an “ingestible” format for your models, and this often involves calculating lagged variables, which can measure auto-correlation i.e. how past values of a variable influence its future values, thus unlocking predictive value.
 - In the model I added the impact of the previous hour 
-- I used shift method. Shifting column data by 1 row down
+- I used shift method of numpy. Shifting column data by 1 row down
 
-
-Cross-Validation: Stratified K-Folds:
-- Splits = 10
 
 
 Algorithm: 
@@ -44,6 +39,9 @@ Algorithm:
 Metrics: RMSLE (root mean squared logarithmic error)
 - Not sensitive to outliers
 
+Cross-Validation - Stratified K-Folds:
+- Splits = 10
+- Manual tuning of the model
 
 ```
 Training for target_carbon_monoxide...
@@ -91,3 +89,5 @@ Overall target_nitrogen_oxides RMSLE: 0.19702871922988907
 
 Total RMSLE is 0.12453999123334672
 ```
+
+The developed model showed good prediction. The RMSLE values at the folds were uniform for each target variable. 
