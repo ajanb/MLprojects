@@ -198,16 +198,12 @@ months = train_X.drop(7110, axis=0)["date_time"].dt.month
 
 total_mean_rmsle = 0
 
-X = pd.DataFrame()
-
 train_X.drop([7110], axis = 0, inplace = True)
 train_y.drop([7110], axis = 0, inplace = True)
 
 for i, target in enumerate(target_cols):
     print(f"\nTraining for {target}...")
 
-    # Getting dataset for a current target in case different datasets should be used for different targets
-#     X, X_test, y = prepare_dataset(train_copy, test_copy, i)
     y = train_y.iloc[:,i]
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=42)
     oof_preds = np.zeros((train_X.shape[0],))
@@ -244,3 +240,41 @@ for i, target in enumerate(target_cols):
 print(f"\n\nTotal RMSLE is {total_mean_rmsle}\n")
 
 
+
+feature_list = set()
+for i in np.arange(len(all_fi)):
+    feature_list = set.union(feature_list, set(all_fi[i].keys()))
+
+
+df = pd.DataFrame(columns=["Feature"])
+df["Feature"] = list(feature_list)
+
+for i in range(len(all_fi)):
+    for key in all_fi[i]:
+        df.loc[df['Feature']==key, 'Importance_'+str(i+1)] = all_fi[i][key]/1000
+        
+df.fillna(0, inplace= True)
+df.sort_values('Importance_1', axis = 0, ascending = False, inplace=True)
+
+
+
+x = np.arange(len(df.Feature))
+height = .3
+
+fig, ax = plt.subplots(figsize = (16,7))
+
+bar1 = ax.barh(x-height, df['Importance_1'], height = height, color = 'teal', label = target_cols[0], edgecolor = 'black')
+
+bar2 = ax.barh(x, df['Importance_2'], height = height, color = 'skyblue', label = target_cols[1], edgecolor = 'black')    
+
+bar3 = ax.barh(x+height, df['Importance_3'], height = height, color = 'salmon', label = target_cols[2], edgecolor = 'black')
+
+ax.set_title('Variable Importances')
+ax.set_xlabel('Feature Importance')
+ax.set_ylabel('Feature names')
+ax.set_yticks(x)
+ax.set_yticklabels(df.Feature, fontsize = 12)
+
+ax.legend(fontsize = 14, loc = 'upper right')
+
+plt.savefig('plots/VariableImportance.jpg')
