@@ -12,6 +12,7 @@ Sensors:
 Predict the target values using the following parameters:
 - 5 sensors collecting chemicals data in the air
 - Weather condition at the time of collecting the data (humidity, temperature)
+
   Extracted the following features from date and time column:
   - Time of day 
   - Weekday
