@@ -1,0 +1,7 @@
+# ignore tags
+.ipynb_checkpoints/
+make_data_lite.ipynb
+predict_setup.ipynb
+example_solution.ipynb
+thumbs.db
+tags
